@@ -1,0 +1,147 @@
+export const GENDERS = {
+  MALE: 'Male',
+  FEMALE: 'Female',
+} as const;
+type GendersKeys = keyof typeof GENDERS;
+export type Gender = (typeof GENDERS)[GendersKeys];
+
+export type PersonID = string;
+
+export interface Person {
+  id: PersonID;
+  name: string;
+  gender: Gender;
+  parents: PersonID[];
+  children: PersonID[];
+  siblings: PersonID[];
+}
+
+export type PeopleData = { [key: string]: Person };
+
+//   TODO: add go to partners
+export interface TreePathNavigation {
+  goToParents?: boolean;
+  goToChildren?: boolean;
+  goToSiblings?: boolean;
+  filterGender?: Gender;
+}
+
+const RELATIONSHIPS = {
+  PATERNAL_UNCLE: 'Paternal-Uncle',
+  MATERNAL_UNCLE: 'Maternal-Uncle',
+  PATERNAL_AUNT: 'Paternal-Aunt',
+  MATERNAL_AUNT: 'Maternal-Aunt',
+  SISTER_IN_LAW: 'Sister-In-Law',
+  BROTHER_IN_LAW: 'Brother-In-Law',
+  // simple relationships
+  DAUGHTER: 'Daughter',
+  SON: 'Son',
+  CHILDREN: 'Children',
+  MOTHER: 'Mother',
+  FATHER: 'Father',
+  PARENTS: 'Parents',
+  SISTER: 'Sister',
+  BROTHER: 'Brother',
+  SIBLINGS: 'Siblings',
+} as const;
+
+type RelationshipsKeys = keyof typeof RELATIONSHIPS;
+export type Relationship = (typeof RELATIONSHIPS)[RelationshipsKeys];
+
+const SIMPLE_RELATIONSHIP_PATH_NAVIGATION: Record<
+  | typeof RELATIONSHIPS.MOTHER
+  | typeof RELATIONSHIPS.FATHER
+  | typeof RELATIONSHIPS.PARENTS
+  | typeof RELATIONSHIPS.SISTER
+  | typeof RELATIONSHIPS.BROTHER
+  | typeof RELATIONSHIPS.SIBLINGS
+  | typeof RELATIONSHIPS.DAUGHTER
+  | typeof RELATIONSHIPS.SON
+  | typeof RELATIONSHIPS.CHILDREN,
+  TreePathNavigation
+> = {
+  [RELATIONSHIPS.MOTHER]: {
+    goToParents: true,
+    filterGender: GENDERS.FEMALE,
+  },
+  [RELATIONSHIPS.FATHER]: {
+    goToParents: true,
+    filterGender: GENDERS.MALE,
+  },
+  [RELATIONSHIPS.PARENTS]: {
+    goToParents: true,
+  },
+  [RELATIONSHIPS.SISTER]: {
+    goToSiblings: true,
+    filterGender: GENDERS.FEMALE,
+  },
+  [RELATIONSHIPS.BROTHER]: {
+    goToSiblings: true,
+    filterGender: GENDERS.MALE,
+  },
+  [RELATIONSHIPS.SIBLINGS]: {
+    goToSiblings: true,
+  },
+  [RELATIONSHIPS.DAUGHTER]: {
+    goToChildren: true,
+    filterGender: GENDERS.FEMALE,
+  },
+  [RELATIONSHIPS.SON]: {
+    goToChildren: true,
+    filterGender: GENDERS.MALE,
+  },
+  [RELATIONSHIPS.CHILDREN]: {
+    goToChildren: true,
+  },
+  //   TODO: add partners
+} as const;
+
+export const RELATIONSHIPS_PATHS: Record<Relationship, TreePathNavigation[]> = {
+  [RELATIONSHIPS.PATERNAL_UNCLE]: [
+    SIMPLE_RELATIONSHIP_PATH_NAVIGATION[RELATIONSHIPS.FATHER],
+    SIMPLE_RELATIONSHIP_PATH_NAVIGATION[RELATIONSHIPS.BROTHER],
+  ],
+  [RELATIONSHIPS.MATERNAL_UNCLE]: [
+    SIMPLE_RELATIONSHIP_PATH_NAVIGATION[RELATIONSHIPS.MOTHER],
+    SIMPLE_RELATIONSHIP_PATH_NAVIGATION[RELATIONSHIPS.BROTHER],
+  ],
+  [RELATIONSHIPS.PATERNAL_AUNT]: [
+    SIMPLE_RELATIONSHIP_PATH_NAVIGATION[RELATIONSHIPS.FATHER],
+    SIMPLE_RELATIONSHIP_PATH_NAVIGATION[RELATIONSHIPS.SISTER],
+  ],
+  [RELATIONSHIPS.MATERNAL_AUNT]: [
+    SIMPLE_RELATIONSHIP_PATH_NAVIGATION[RELATIONSHIPS.MOTHER],
+    SIMPLE_RELATIONSHIP_PATH_NAVIGATION[RELATIONSHIPS.SISTER],
+  ],
+  //   TODO: add partners
+  [RELATIONSHIPS.SISTER_IN_LAW]: [],
+  [RELATIONSHIPS.BROTHER_IN_LAW]: [],
+  // simple relationship paths
+  [RELATIONSHIPS.SON]: [SIMPLE_RELATIONSHIP_PATH_NAVIGATION[RELATIONSHIPS.SON]],
+  [RELATIONSHIPS.DAUGHTER]: [SIMPLE_RELATIONSHIP_PATH_NAVIGATION[RELATIONSHIPS.DAUGHTER]],
+  [RELATIONSHIPS.CHILDREN]: [SIMPLE_RELATIONSHIP_PATH_NAVIGATION[RELATIONSHIPS.CHILDREN]],
+  [RELATIONSHIPS.SISTER]: [SIMPLE_RELATIONSHIP_PATH_NAVIGATION[RELATIONSHIPS.SISTER]],
+  [RELATIONSHIPS.BROTHER]: [SIMPLE_RELATIONSHIP_PATH_NAVIGATION[RELATIONSHIPS.BROTHER]],
+  [RELATIONSHIPS.SIBLINGS]: [SIMPLE_RELATIONSHIP_PATH_NAVIGATION[RELATIONSHIPS.SIBLINGS]],
+  [RELATIONSHIPS.MOTHER]: [SIMPLE_RELATIONSHIP_PATH_NAVIGATION[RELATIONSHIPS.MOTHER]],
+  [RELATIONSHIPS.FATHER]: [SIMPLE_RELATIONSHIP_PATH_NAVIGATION[RELATIONSHIPS.FATHER]],
+  [RELATIONSHIPS.PARENTS]: [SIMPLE_RELATIONSHIP_PATH_NAVIGATION[RELATIONSHIPS.PARENTS]],
+};
+
+export const PEOPLE_COMMANDS = {
+  ADD_CHILD: 'ADD_CHILD',
+  GET_RELATIONSHIP: 'GET_RELATIONSHIP',
+};
+
+export const PEOPLE_RESPONSE_MESSAGES = {
+  CHILD_ADDITION_FAILED: 'CHILD_ADDITION_FAILED',
+  PERSON_NOT_FOUND: 'PERSON_NOT_FOUND',
+  CHILD_CREATED: 'CHILD_CREATED',
+  NONE: 'NONE',
+  CHILD_NAME_EMPTY: 'CHILD_NAME_EMPTY',
+  CHILD_GENDER_ERROR: 'CHILD_GENDER_ERROR',
+  ALREADY_EXISTS: 'ALREADY_EXISTS',
+  UNKNOWN_COMMAND: 'UNKNOWN_COMMAND',
+} as const;
+type PeopleResponseMessagesKeys = keyof typeof PEOPLE_RESPONSE_MESSAGES;
+export type PeopleResponseMessage = (typeof PEOPLE_RESPONSE_MESSAGES)[PeopleResponseMessagesKeys];
